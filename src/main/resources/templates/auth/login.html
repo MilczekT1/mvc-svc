@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Budget - Sign In</title>
+</head>
+<body>
+<center>
+    <p LOGOWANIE/>
+    <div th:if="${param.error}">
+        Invalid username and/or password.
+    </div>
+    <div th:if="${param.logout}">
+        You have been logged out.
+    </div>
+
+    <form th:action="@{https://konradboniecki.com.pl/authenticate}" th:object="${loginForm}" method=POST>
+
+        <p th:text="#{login.emailDescription}"></p>
+        <input type="text" th:field="*{email}" name="email" id="email"/></br>
+        <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+
+        <p th:text="#{login.passwordDescription}"></p>
+        <input type="password" th:field="*{password}" name="password" id="password"/></br>
+        <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+
+        </br> <input type="submit" id="submit" name="submit" value="Zaloguj"/>
+    </form>
+
+    <br/><br/><br/>
+    <form th:action="@{https://konradboniecki.com.pl/register}" method="GET">
+        <button type="submit" th:text="#{login.createAccountButton}"></button>
+    </form>
+
+    <br/><br/><br/>
+    <form th:action="@{https://konradboniecki.com.pl/api/reset-password/form}" method="GET">
+        <button type="submit" th:text="#{login.createNewPasswordButton}"></button>
+    </form>
+</center>
+</body>
+</html>

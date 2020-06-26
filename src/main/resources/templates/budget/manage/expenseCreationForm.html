@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Expense</title>
+</head>
+<body>
+<center>
+    <p>[[${#httpServletRequest.remoteUser}]]!</p>
+    <form th:action="@{/logout}" method="post">
+        <input type="submit" value="Sign Out"/>
+    </form>
+
+    <p>Menu:</p>
+    <a th:href="@{https://konradboniecki.com.pl/budget/family}" th:text="#{commons.familyPanel}"/> <br/>
+    <a th:href="@{https://konradboniecki.com.pl/budget/manage}" th:text="#{commons.budgetPanel}"/> <br/>
+    <br/>
+    <hr/>
+
+    <p th:text="#{expenseCreationForm.instructions}"></p>
+    <form th:action="@{https://konradboniecki.com.pl/budget/manage/expense/add}" th:object="${newExpenseCreationForm}"
+          method="POST">
+
+        <p th:text="#{expenseCreationForm.amount}"></p>
+        <input type="text" th:field="*{amount}"/></br>
+        <span th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></span>
+
+        <p th:text="#{expenseCreationForm.comment}"></p>
+        <input type="text" th:field="*{comment}"/></br>
+        <span th:if="${#fields.hasErrors('comment')}" th:errors="*{comment}"></span>
+
+        <input type="hidden" th:name="budgetId" th:value="${budgetId}"/>
+        <input type="submit" th:value="#{expenseCreationForm.newExpenseSubmitButton}"/>
+    </form>
+    <hr/>
+</center>
+</body>
+</html>

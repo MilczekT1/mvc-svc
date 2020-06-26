@@ -1,0 +1,12 @@
+budget:
+  baseUrl:
+    gateway: "https://konradboniecki.com.pl"
+    budgetManagement: "http://localhost:10000"
+    accountManagement: "http://localhost:10000"
+    familyManagement: "http://localhost:10000"
+    mail: "http://localhost:10000"
+spring:
+  security:
+    user:
+      name: "testUserName"
+      password: "testUserPassword"

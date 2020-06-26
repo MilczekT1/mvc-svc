@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Jar</title>
+</head>
+<body>
+<center>
+    <p>[[${#httpServletRequest.remoteUser}]]!</p>
+    <form th:action="@{/logout}" method="post">
+        <input type="submit" value="Sign Out"/>
+    </form>
+
+    <p>Menu:</p>
+    <a th:href="@{https://konradboniecki.com.pl/budget/family}" th:text="#{commons.familyPanel}"/> <br/>
+    <a th:href="@{https://konradboniecki.com.pl/budget/manage}" th:text="#{commons.budgetPanel}"/> <br/>
+    <br/>
+    <hr/>
+
+
+    <p th:text="#{jarCreationForm.instructions}"></p>
+    <form th:action="@{https://konradboniecki.com.pl/budget/manage/create-jar}" th:object="${newJarCreationForm}"
+          method="POST">
+        <div>
+            <p th:text="#{jarCreationForm.jarName}"></p>
+            <input type="text" th:field="*{jarName}"/></br>
+            <span th:if="${#fields.hasErrors('jarName')}" th:errors="*{jarName}"></span>
+            <p th:text="#{jarCreationForm.capacity}"></p>
+            <input type="text" th:field="*{capacity}"/></br>
+            <span th:if="${#fields.hasErrors('capacity')}" th:errors="*{capacity}"></span>
+        </div>
+        <input type="submit" th:value="#{jarCreationForm.newJarSubmitButton}"/>
+    </form>
+    <hr/>
+</center>
+</body>
+</html>

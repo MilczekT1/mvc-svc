@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+</head>
+<body>
+<center>
+    <p>[[${#httpServletRequest.remoteUser}]]!</p>
+    <form th:action="@{/logout}" method="post">
+        <input type="submit" value="Sign Out"/>
+    </form>
+    <br/>
+
+    <div th:switch="${errorType}">
+        <p th:case="invalidActivationLink" th:text="#{error.invalidActivationLink}"></p>
+        <p th:case="processingException" th:text="#{error.processingException}"></p>
+        <p th:case="alreadyInFamily" th:text="#{error.alreadyInFamily}"></p>
+        <p th:case="invalidInvitationLink" th:text="#{error.invalidInvitationLink}"></p>
+        <p th:case="notEnoughSpaceInFamily" th:text="#{error.notEnoughSpaceInFamily}"></p>
+        <p th:case="*" th:text="#{error.undefined}"></p>
+    </div>
+</center>
+
+</body>
+</html>

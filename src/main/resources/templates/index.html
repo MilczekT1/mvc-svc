@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org" xmlns:sec="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Budget</title>
+</head>
+<center>
+    <a th:href="@{https://konradboniecki.com.pl/register}" th:text="#{commons.register}"/>
+    <a th:href="@{https://konradboniecki.com.pl/login}" th:text="#{commons.login}"/>
+
+    <form th:action="@{/logout}" method="post">
+        <input type="submit" value="Sign Out"/>
+    </form>
+    <hr>
+    <p th:text="#{index.greeting}"/>
+    <span sec:authorize="isAuthenticated()">
+        <p th:inline="text">[[${#httpServletRequest.remoteUser}]]</p>
+    </span>
+    <hr>
+    <h1><a th:href="@{https://konradboniecki.com.pl/budget/home}" th:text="#{index.budget}"/></h1>
+    <!--    <hr>-->
+    <!--    <h1><a th:href="@{https://konradboniecki.com.pl/horsee/home}" th:text="#{index.horsee}"/></h1>-->
+    <!--    <hr>-->
+</center>
+</body>
+</html>

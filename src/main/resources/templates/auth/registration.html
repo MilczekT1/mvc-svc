@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Budget Sign up</title>
+</head>
+<body>
+
+<center>
+    <form th:action="@{https://konradboniecki.com.pl/register}" th:object="${accountFormObject}" method="POST">
+
+        <p th:text="#{registration.firstNameDescription}"></p>
+        <input type="text" th:field="*{firstName}"/></br>
+        <span th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
+
+        <p th:text="#{registration.lastNameDescription}"></p>
+        <input type="text" th:field="*{lastName}"/></br>
+        <span th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
+
+        <p th:text="#{registration.emailDescription}"></p>
+        <input type="text" th:field="*{email}"/></br>
+        <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+        <span th:if="${emailAlreadyExists}" th:text="#{registration.emailAlreadyExists}"></span>
+
+        <p th:text="#{registration.passwordDescription}"></p>
+        <input type="password" th:field="*{password}"/></br>
+        <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+
+        <p th:text="#{registration.repeatedPasswordDescription}"></p>
+        <input type="password" th:field="*{repeatedPassword}"/></br>
+        <span th:if="${#fields.hasErrors('repeatedPassword')}" th:errors="*{repeatedPassword}"></span>
+        <span th:if="${repeatedPasswordFailure}" th:text="#{registration.repeatedPasswordFailure}"></span>
+
+        </br> <input type="submit" id="submit" th:value="#{registration.registerButton}"/>
+    </form>
+</center>
+</body>
+</html>

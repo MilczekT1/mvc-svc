@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Budget Home</title>
+</head>
+<body>
+<center>
+    <p>[[${#httpServletRequest.remoteUser}]]!</p>
+    <form th:action="@{https://konradboniecki.com.pl/logout}" method="post">
+        <input type="submit" value="Sign Out"/>
+    </form>
+    <hr>
+    <p>Menu:</p>
+    <a th:href="@{https://konradboniecki.com.pl/budget/family}" th:text="#{commons.familyPanel}"/> <br/>
+    <a th:href="@{https://konradboniecki.com.pl/budget/manage}" th:text="#{commons.budgetPanel}"/> <br/>
+
+</center>
+</body>
+</html>

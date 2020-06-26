@@ -1,0 +1,135 @@
+deployment_command: &deployment_command
+  command: |
+    cd /home/circleci/repo/shared_workspace
+    export LC_MVC_TAG=$(cat tag.txt)
+    echo "================ ATTEMPTING TO DEPLOY $LC_MVC_TAG ================"
+    ssh -t -o SendEnv=LC_MVC_TAG root@77.55.214.60 'MVC_TAG=$LC_MVC_TAG; unset LC_MVC_TAG; export MVC_TAG; echo "export MVC_TAG=$MVC_TAG" >> ~/.bashrc; /snap/bin/yq w /root/budget-operations/deployment/k8s/mvc.yaml -i "spec.template.spec.containers[0].image" "konradboniecki/budget:$MVC_TAG"; kubectl apply -f /root/budget-operations/deployment/k8s/mvc.yaml'
+deployment_setup: &deployment_setup
+  machine:
+    enabled: true
+  steps:
+    - add_ssh_keys:
+        fingerprints:
+          - "fingerprint"
+    - attach_workspace:
+        at: ~/repo
+    - run:
+        name: Deploy Over SSH
+        <<: *deployment_command
+        no_output_timeout: 3m
+
+non_master_branch_filter: &non_master_branch_filter
+  filters:
+    branches:
+      only:
+        - develop
+        - /feature.*/
+        - /bugfix.*/
+docker_java_11: &docker_java_11
+  docker:
+    - image: circleci/openjdk:11.0.3-jdk-stretch
+  environment:
+    JVM_OPTS: -Xmx3200m
+    TERM: dumb
+version: 2
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy_master:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+      - approve_deployment:
+          type: approval
+          requires:
+            - build
+          <<: *non_master_branch_filter
+      - deploy:
+          requires:
+            - approve_deployment
+      - deploy-to-nexus-approval:
+          type: approval
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master
+                - develop
+      - deploy-to-nexus:
+          requires:
+            - deploy-to-nexus-approval
+jobs:
+  build:
+    <<: *docker_java_11
+    working_directory: ~/repo
+    steps:
+      - setup_remote_docker:
+          version: 18.06.0-ce
+          docker_layer_caching: false
+      - add_ssh_keys:
+          fingerprints:
+            - "fingerprint"
+      - checkout
+      - restore_cache:
+          keys:
+            - m2-{{ checksum "pom.xml" }}
+      - run:
+          name: Build and run tests
+          command: |
+            mvn clean install -s .circleci/settings.xml -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: m2-{{ checksum "pom.xml" }}
+      - run:
+          name: Build and push docker image
+          command: |
+            VERSION=$(mvn help:evaluate -s .circleci/settings.xml -Dexpression=project.version -q -DforceStdout)
+            TAG=$CIRCLE_PROJECT_REPONAME-$VERSION-$CIRCLE_BUILD_NUM-PR
+            if [ "$CIRCLE_BRANCH" == "master" ]; then
+              TAG=$CIRCLE_PROJECT_REPONAME-$VERSION
+            fi
+            if [ "$CIRCLE_BRANCH" == "develop" ]; then
+              TAG=$CIRCLE_PROJECT_REPONAME-$VERSION-$CIRCLE_BUILD_NUM
+            fi
+
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker build -t konradboniecki/budget:$TAG . --build-arg ARTIFACT=mvc-$VERSION.jar
+            docker push konradboniecki/budget:$TAG
+
+            mkdir shared_workspace
+            touch shared_workspace/tag.txt
+            echo $TAG > shared_workspace/tag.txt
+      - store_test_results:
+          path: target/surefire-reports
+      - store_artifacts:
+          path: target/surefire-reports/surefire-report.html
+      - store_artifacts:
+          path: target/site/jacoco/
+      - store_artifacts:
+          path: target/surefire-reports
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - shared_workspace
+  deploy-to-nexus:
+    <<: *docker_java_11
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - m2-{{ checksum "pom.xml" }}
+      - run:
+          name: Deploy artifacts to nexus
+          command: |
+            mvn deploy -s .circleci/settings.xml -DskipTests=true
+  deploy_master:
+    <<: *deployment_setup
+  deploy:
+    <<: *deployment_setup

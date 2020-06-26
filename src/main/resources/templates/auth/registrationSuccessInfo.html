@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Success</title>
+</head>
+<body>
+<center>
+    <p th:text="#{registrationSuccessInfo.info}"></p>
+    <form th:action="@{https://konradboniecki.com.pl/login}" method=get>
+        <button type="submit" th:text="Login"></button>
+    </form>
+</center>
+</body>
+</html>
